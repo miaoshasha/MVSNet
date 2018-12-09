@@ -8,9 +8,8 @@ echo "code version is "$codev
 gcloud components update
 
 # set up cloud bucket for source code
-PROJECT_ID=$(gcloud config list project --format "value(core.project)")
 MODEL_FOLDER="dtu_train_test_model"
-SOURCE_BUCKET_NAME=${PROJECT_ID}-${MODEL_FOLDER}
+SOURCE_BUCKET_NAME=${MODEL_FOLDER}
 
 # package code
 python setup.py sdist
@@ -22,7 +21,7 @@ SOURCE_CODE="gs://$SOURCE_BUCKET_NAME/project/$file_name"
 gsutil cp $local_file_path/$file_name $SOURCE_CODE
 
 # train log bucket
-BUCKET_NAME_SUR="${PROJECT_ID}-mvsnet"
+BUCKET_NAME_SUR="mvsnet"
 echo $BUCKET_NAME_SUR
 REGION=us-central1
 
@@ -50,7 +49,7 @@ test_folder="gs://$MVSNET_BUCKET_NAME/dtu_test_scan9.zip"
 ckpt_file="gs://$MVSNET_BUCKET_NAME/model/model.ckpt"
 
 # package and submit job
-gcloud ml-engine jobs submit trainning $JOB_NAME \
+gcloud ml-engine jobs submit training $JOB_NAME \
     --scale-tier "${TIER}"  \
     --module-name mvsnet.test \
     --region "${REGION}" \
