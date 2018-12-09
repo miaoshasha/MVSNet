@@ -33,16 +33,12 @@ JOB_NAME="mvsnet_$now"
 
 # create the new bucket
 out_dir="${BUCKET_NAME_SUR}-out"
-#gsutil mb -l $REGION gs://$out_dir # comment out after first run
+gsutil mb -l $REGION gs://$out_dir # comment out after first run
 
 # log folder for each training
-OUTPUT_DIR="gs://$out_dir/$JOB_NAME/logdir"
+OUTPUT_DIR="gs://$out_dir/$JOB_NAME"
 
 #gsutil mb -l $REGION $PACKAGE_STAGING_BUCKET
-
-# location of source project
-TRAINER_PACKAGE_PATH="train"
-
 
 # hardware to use
 TIER="BASIC_GPU" # BASIC | BASIC_GPU | STANDARD_1 | PREMIUM_1
@@ -54,7 +50,7 @@ test_folder="gs://$MVSNET_BUCKET_NAME/dtu_test_scan9.zip"
 ckpt_file="gs://$MVSNET_BUCKET_NAME/model/model.ckpt"
 
 # package and submit job
-gcloud ml-engine jobs submit training $JOB_NAME \
+gcloud ml-engine jobs submit trainning $JOB_NAME \
     --scale-tier "${TIER}"  \
     --module-name mvsnet.test \
     --region "${REGION}" \
