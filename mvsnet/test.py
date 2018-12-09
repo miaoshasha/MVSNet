@@ -47,6 +47,10 @@ tf.app.flags.DEFINE_integer('base_image_size', 32,
 tf.app.flags.DEFINE_integer('batch_size', 1, 
                             """training batch size""")
 
+# params for output
+tf.app.flags.DEFINE_string('output_folder', None, 
+                           """Root path to output folder on GCP.""")
+
 # params for config
 tf.app.flags.DEFINE_string('pretrained_model_ckpt_path', 
                            '/data/dtu/tf_model/mvsnet_arxiv/model.ckpt',
@@ -137,9 +141,12 @@ def mvsnet_pipeline(mvs_list):
 
     # create output folder
     print ('sample number: ', len(mvs_list))
-    output_folder = os.path.join(FLAGS.dense_folder, 'depths_mvsnet')
-    if not os.path.isdir(output_folder):
-        os.mkdir(output_folder)
+    if FLAGS.dense_folder[:3] == "gs:":
+        output_folder = FLAGS.output_folder
+    else:
+        output_folder = FLAGS.dense_folder, 'depths_mvsnet')
+        if not os.path.isdir(output_folder):
+            os.mkdir(output_folder)
 
     # Training and validation generators
     mvs_generator = iter(MVSGenerator(mvs_list, FLAGS.view_num))

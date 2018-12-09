@@ -64,4 +64,4 @@ gcloud ml-engine jobs submit training $JOB_NAME \
     --job_name=$JOB_NAME \
     --pretrained_model_ckpt_path=$ckpt_file \
     --dense_folder=$test_folder \
-    --log_dir="${OUTPUT_DIR}"
+    --output_folder="${OUTPUT_DIR}"
