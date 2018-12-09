@@ -32,7 +32,7 @@ JOB_NAME="mvsnet_$now"
 
 # create the new bucket
 out_dir="${BUCKET_NAME_SUR}-out"
-gsutil mb -l $REGION gs://$out_dir # comment out after first run
+# gsutil mb -l $REGION gs://$out_dir # comment out after first run
 
 # log folder for each training
 OUTPUT_DIR="gs://$out_dir/$JOB_NAME"
