@@ -45,6 +45,7 @@ TIER="BASIC_GPU" # BASIC | BASIC_GPU | STANDARD_1 | PREMIUM_1
 # data dir
 MVSNET_BUCKET_NAME=${MODEL_FOLDER}
 test_folder="gs://$MVSNET_BUCKET_NAME/dtu_test_scan9.zip"
+echo "test data folder is ${test_folder}"
 # checkpoint file
 ckpt_file="gs://$MVSNET_BUCKET_NAME/model/model.ckpt"
 

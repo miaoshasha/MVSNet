@@ -250,8 +250,9 @@ def main(_):  # pylint: disable=unused-argument
         local_folder= '/tmpdata'
         os.mkdir(local_folder)
         
-        gcp_bucket_path = os.path.basename(FLAGS.dense_folder)
+        gcp_bucket_path = os.path.dirname(FLAGS.dense_folder)
         file_name = os.path.basename(FLAGS.dense_folder)
+        print ("downloading from {} to {}", gcp_bucket_path, local_folder)
         cloud_local_file_exchange(gcp_bucket_path, local_folder, file_name)
         FLAGS.dense_folder = local_folder
         call(['tar', '-xf', local_folder + '/' + file_name, '-C', local_folder])
@@ -261,9 +262,9 @@ def main(_):  # pylint: disable=unused-argument
         gcp_bucket_path = os.path.dirname(FLAGS.pretrained_model_ckpt_path)
         local_ckpt_path = "/ckpts"
         cloud_local_file_exchange(gcp_bucket_path, local_ckpt_path)
-        assert os.path.isfile(local_ckpt_path+'/'+file_name)
-        print("downloaded %s to local dir %s" %(file_name, local_ckpt_path))
-        FLAGS.pretrained_model_ckpt_path = os.path.join(local_ckpt_path, file_name)
+        assert os.path.isfile(local_ckpt_path+'/model/'+file_name)
+        print("ckpts downloaded %s to local dir %s" %(file_name, local_ckpt_path))
+        FLAGS.pretrained_model_ckpt_path = os.path.join(local_ckpt_path, "model", file_name)
 
         # change output dir to local dir
         output_gcp_folder = FLAGS.output_folder
