@@ -12,6 +12,7 @@ import sys
 import math
 import argparse
 import numpy as np
+from subprocess import call
 
 import cv2
 #import matplotlib.pyplot as plt
@@ -19,6 +20,7 @@ import tensorflow as tf
 
 sys.path.append("../")
 from tools.common import Notify
+from tools.f_exchange import cloud_local_file_exchange
 from preprocess import *
 from model import *
 
@@ -144,7 +146,7 @@ def mvsnet_pipeline(mvs_list):
     if FLAGS.dense_folder[:3] == "gs:":
         output_folder = FLAGS.output_folder
     else:
-        output_folder = FLAGS.dense_folder, 'depths_mvsnet')
+        output_folder = os.path.join(FLAGS.dense_folder, 'depths_mvsnet')
         if not os.path.isdir(output_folder):
             os.mkdir(output_folder)
 
@@ -242,10 +244,40 @@ def mvsnet_pipeline(mvs_list):
 
 def main(_):  # pylint: disable=unused-argument
     """ program entrance """
+    # gcp data transfer
+    if FLAGS.dense_folder[:3] == "gs:":
+        # pull test data
+        local_folder= '/tmpdata'
+        os.mkdir(local_folder)
+        
+        gcp_bucket_path = os.path.basename(FLAGS.dense_folder)
+        file_name = os.path.basename(FLAGS.dense_folder)
+        cloud_local_file_exchange(gcp_bucket_path, local_folder, file_name)
+        FLAGS.dense_folder = local_folder
+        call(['tar', '-xf', local_folder + '/' + file_name, '-C', local_folder])
+        
+        # pull checkpoint
+        file_name = os.path.basename(FLAGS.pretrained_model_ckpt_path)
+        gcp_bucket_path = os.path.dirname(FLAGS.pretrained_model_ckpt_path)
+        local_ckpt_path = "/ckpts"
+        cloud_local_file_exchange(gcp_bucket_path, local_ckpt_path)
+        assert os.path.isfile(local_ckpt_path+'/'+file_name)
+        print("downloaded %s to local dir %s" %(file_name, local_ckpt_path))
+        FLAGS.pretrained_model_ckpt_path = os.path.join(local_ckpt_path, file_name)
+
+        # change output dir to local dir
+        output_gcp_folder = FLAGS.output_folder
+        FLAGS.output_folder = "/outputs"
+        
+
     # generate input path list
     mvs_list = gen_pipeline_mvs_list(FLAGS.dense_folder)
     # mvsnet inference
     mvsnet_pipeline(mvs_list)
+
+    if FLAGS.dense_folder[:3] == "gs:":
+        cloud_local_file_exchange(FLAGS.output_folder, output_gcp_folder)
+        print("outputs saved to %s" %output_gcp_folder)
 
 
 if __name__ == '__main__':
